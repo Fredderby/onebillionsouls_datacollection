@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("attendanceForm");
   const formBody = document.getElementById("formBody");
   const successPanel = document.getElementById("successPanel");
+  const submitProgress = document.getElementById("submitProgress");
   const submitBtn = document.getElementById("submitBtn");
   const clearBtn = document.getElementById("clearBtn");
   const anotherBtn = document.getElementById("anotherBtn");
@@ -218,6 +219,7 @@ document.addEventListener("DOMContentLoaded", () => {
     submitBtn.classList.toggle("loading", loading);
     submitBtn.disabled = loading;
     clearBtn.disabled = loading;
+    submitProgress.hidden = !loading;
   }
 
   form.addEventListener("submit", async (event) => {
