@@ -73,6 +73,16 @@ class ValidationTests(unittest.TestCase):
             html,
         )
 
+    def test_rendered_form_has_hidden_submit_progress_bar(self):
+        html = attendance_app.app.test_client().get("/").get_data(as_text=True)
+
+        self.assertIn('id="submitProgress"', html)
+        self.assertIn('class="submit-progress"', html)
+        self.assertIn('aria-label="Saving report"', html)
+        self.assertIn('class="submit-progress-track"', html)
+        self.assertIn('class="submit-progress-fill"', html)
+        self.assertIn('id="submitProgress" class="submit-progress" role="status" aria-label="Saving report" hidden', html)
+
 
 if __name__ == "__main__":
     unittest.main()

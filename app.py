@@ -104,6 +104,8 @@ CREATE TABLE IF NOT EXISTS attendance_reports (
 )
 """
 
+DELETE_REPORT_SQL = "DELETE FROM attendance_reports WHERE id = %s"
+
 INSERT_SQL = """
 INSERT INTO attendance_reports (
     zone, region, division,
@@ -326,6 +328,15 @@ def secure_compare(left, right):
     return hmac.compare_digest(left.encode("utf-8"), right.encode("utf-8"))
 
 
+def admin_csrf_token():
+    """Return the signed-in admin's form token, creating it on first use."""
+    token = session.get("csrf_token")
+    if not token:
+        token = secrets.token_urlsafe(32)
+        session["csrf_token"] = token
+    return token
+
+
 def is_admin():
     return admin_available() and session.get("admin") is True
 
@@ -491,7 +502,45 @@ def admin():
         missing=missing,
         data_error=data_error,
         reporting_date=REPORTING_LABEL,
+        csrf_token=admin_csrf_token(),
+        deleted=request.args.get("deleted") == "1",
     )
+
+
+@app.route("/admin/reports/<int:report_id>/delete", methods=["POST"])
+def admin_delete_report(report_id):
+    gate = require_admin()
+    if gate is not None:
+        return gate
+
+    submitted_token = request.form.get("csrf_token", "")
+    expected_token = session.get("csrf_token", "")
+    if not expected_token or not secure_compare(submitted_token, expected_token):
+        return Response("Invalid form token.", status=400, mimetype="text/plain")
+
+    query = request.form.get("q", "").strip()
+    connection = None
+    try:
+        connection = get_connection()
+        cursor = connection.cursor()
+        cursor.execute(DELETE_REPORT_SQL, (report_id,))
+        connection.commit()
+        cursor.close()
+    except Exception as exc:  # noqa: BLE001 - surface DB errors, never guess success
+        app.logger.warning("Could not delete report: %s", exc)
+        return Response(
+            "Could not delete report. Check the database connection and try again.",
+            status=503,
+            mimetype="text/plain",
+        )
+    finally:
+        if connection is not None:
+            try:
+                connection.close()
+            except Exception:  # noqa: BLE001
+                pass
+
+    return redirect(url_for("admin", tab="reports", q=query, deleted=1))
 
 
 @app.route("/admin/export.csv")

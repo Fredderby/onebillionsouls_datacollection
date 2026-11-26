@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&amp;family=Newsreader:opsz,wght@6..72,600&amp;display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}" />
+    <script src="{{ url_for('static', filename='admin.js') }}" defer></script>
   </head>
   <body class="admin-page">
     <div class="page admin-shell">
@@ -47,6 +48,10 @@
           </div>
         </div>
 
+        {% if deleted %}
+        <div class="admin-alert admin-alert-success" role="status">Report deleted.</div>
+        {% endif %}
+
         {% if data_error %}
         <div class="admin-alert" role="alert">{{ data_error }}</div>
         {% endif %}
@@ -64,6 +69,7 @@
                 <th scope="col" class="numeric">Online</th>
                 <th scope="col" class="numeric">Grand total</th>
                 <th scope="col">Submitted</th>
+                <th scope="col">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -79,6 +85,9 @@
                 <td class="numeric">{{ online }}</td>
                 <td class="numeric total">{{ in_person + online }}</td>
                 <td>{{ row['submitted_at'] }}</td>
+                <td class="actions">
+                  <button type="button" class="admin-btn admin-btn-danger delete-trigger" data-delete-action="{{ url_for('admin_delete_report', report_id=row['id']) }}" data-delete-label="{{ row['division'] }}" aria-haspopup="dialog">Delete</button>
+                </td>
               </tr>
               {% endfor %}
             </tbody>
@@ -87,6 +96,20 @@
         {% else %}
         <p class="admin-empty">No reports match this search.</p>
         {% endif %}
+
+        <dialog id="deleteDialog" class="admin-dialog" aria-labelledby="deleteDialogTitle">
+          <form method="post" id="deleteForm" class="admin-dialog-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+            <input type="hidden" name="q" value="{{ query }}" />
+            <div class="admin-dialog-icon" aria-hidden="true">!</div>
+            <h2 id="deleteDialogTitle">Delete this report?</h2>
+            <p>You are about to permanently delete the report for <strong id="deleteTarget"></strong>. This cannot be undone.</p>
+            <div class="admin-dialog-actions">
+              <button type="button" class="admin-btn admin-btn-quiet" id="cancelDeleteBtn">Cancel</button>
+              <button type="submit" class="admin-btn admin-btn-danger" id="confirmDeleteBtn">Delete report</button>
+            </div>
+          </form>
+        </dialog>
       </section>
       {% else %}
       <section class="admin-panel" aria-labelledby="defaultersHeading">

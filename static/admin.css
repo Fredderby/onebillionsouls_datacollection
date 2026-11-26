@@ -235,7 +235,81 @@ body.admin-page {
   border-color: var(--color-on-ink-rule);
 }
 .admin-btn-quiet:hover { background: var(--color-ink-2); }
+.admin-btn-danger {
+  color: var(--color-accent-ink);
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+}
+.admin-btn-danger:hover { filter: brightness(1.06); }
 .admin-login-form .admin-btn { width: 100%; }
+
+.admin-alert-success {
+  color: var(--color-ink);
+  background: var(--color-sky-soft);
+  border-color: var(--color-sky);
+}
+
+/* ---------- Delete confirmation dialog ---------- */
+
+.admin-dialog {
+  width: min(26rem, calc(100vw - 2rem));
+  padding: 0;
+  color: var(--color-ink);
+  background: var(--color-paper);
+  border: 1px solid var(--color-rule);
+  border-top: 4px solid var(--color-accent);
+  border-radius: var(--radius-sheet);
+  box-shadow: var(--shadow-card);
+}
+.admin-dialog::backdrop {
+  background: oklch(24% 0.014 260 / 0.55);
+  backdrop-filter: blur(3px);
+}
+.admin-dialog[open] { animation: admin-dialog-in 180ms ease-out; }
+@keyframes admin-dialog-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.admin-dialog-form {
+  display: grid;
+  gap: var(--space-sm);
+  padding: var(--space-lg);
+}
+.admin-dialog-icon {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-bottom: var(--space-2xs);
+  color: var(--color-accent-ink);
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+  background: var(--color-accent);
+  border-radius: 50%;
+}
+.admin-dialog h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 600;
+}
+.admin-dialog p {
+  margin: 0;
+  color: var(--color-ink-2);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+.admin-dialog p strong { color: var(--color-accent); }
+.admin-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-xs);
+  margin-top: var(--space-sm);
+}
+@media (prefers-reduced-motion: reduce) {
+  .admin-dialog[open] { animation: none; }
+}
 
 .admin-count {
   padding: var(--space-2xs) var(--space-sm);
@@ -269,6 +343,7 @@ body.admin-page {
 .admin-table tbody tr:hover { background: var(--color-sky-soft); }
 .admin-table .numeric { text-align: right; font-variant-numeric: tabular-nums; }
 .admin-table .total { color: var(--color-accent); font-weight: 600; }
+.admin-table td.actions { text-align: right; }
 .admin-empty {
   margin: 0;
   padding: var(--space-xl);

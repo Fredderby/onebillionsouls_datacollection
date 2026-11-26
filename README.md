@@ -36,6 +36,29 @@ Open <http://127.0.0.1:3003>. Compose starts MySQL 8 and the Flask app together:
 through Compose. To stop and keep the data: `docker compose down`. To wipe the database
 as well: `docker compose down -v`.
 
+**Important:** do not run `souls-web` as a standalone `docker run` container with
+`DB_HOST=db`. The name `db` is a Compose service on the private `souls_default` network;
+outside Compose it cannot be resolved and submissions fail with
+`Unknown MySQL server host 'db'`. Always start the stack from this folder with
+`docker compose up --build`, then confirm both services are up with `docker compose ps`.
+
+### Dokploy / external MySQL
+
+Deploy as a **Docker Compose** service. The web service reads `DB_HOST` and
+`DB_PORT` directly from the environment, so set them in the Dokploy environment
+tab to your external MySQL values, for example:
+
+```text
+DB_HOST=your-mysql-host
+DB_PORT=19944
+```
+
+Also set `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `MYSQL_ROOT_PASSWORD`, `ADMIN_USER`,
+`ADMIN_PASSWORD` and `SECRET_KEY` there. Dokploy writes these to `.env`, and the
+`env_file` entry in `docker-compose.yml` loads them into the app.
+
+To use the bundled Compose MySQL instead, set `DB_HOST=db` and `DB_PORT=3306`.
+
 ## Configuration
 
 Copy `.env.example` to `.env` and fill in your MySQL details. `.env` is gitignored —
@@ -51,11 +74,15 @@ For the admin area also set `SECRET_KEY` (a long random string), `ADMIN_USER` an
 After signing in, `/admin` has two tabs:
 
 - **Reports** — newest-first submitted reports, searchable by zone/region/division,
-  with a CSV export of the current filtered view.
+  with a CSV export of the current filtered view. Each row has a **Delete** button
+  that opens a styled confirmation dialog before permanently removing that report.
+  The active search is preserved after deletion.
 - **Defaulters** — every division in `zones.py` with no submission for Sunday,
   29 November 2026.
 
-Admin access is read-only; submissions cannot be edited or deleted from the panel.
+Submissions cannot be edited from the panel. Deletion is permanent and is protected
+by a per-session CSRF token; a deleted division reappears in Defaulters if it has no
+other submission for the reporting date.
 
 ## Files
 
@@ -66,5 +93,6 @@ Admin access is read-only; submissions cannot be edited or deleted from the pane
 - `zones.py` — hierarchy dictionary (source of truth for dropdowns)
 - `templates/admin_login.html`, `templates/admin.html` — admin login and report tables
 - `static/admin.css` — admin-only styling
+- `static/admin.js` — delete confirmation dialog behaviour
 - `Dockerfile`, `docker-compose.yml`, `.dockerignore` — container setup on port 3003
 - `tests/` — validation and admin tests (`python -m unittest discover -s tests`)
