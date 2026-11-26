@@ -36,6 +36,12 @@ Open <http://127.0.0.1:3003>. Compose starts MySQL 8 and the Flask app together:
 through Compose. To stop and keep the data: `docker compose down`. To wipe the database
 as well: `docker compose down -v`.
 
+**Important:** do not run `souls-web` as a standalone `docker run` container with
+`DB_HOST=db`. The name `db` is a Compose service on the private `souls_default` network;
+outside Compose it cannot be resolved and submissions fail with
+`Unknown MySQL server host 'db'`. Always start the stack from this folder with
+`docker compose up --build`, then confirm both services are up with `docker compose ps`.
+
 ## Configuration
 
 Copy `.env.example` to `.env` and fill in your MySQL details. `.env` is gitignored —
