@@ -44,19 +44,20 @@ outside Compose it cannot be resolved and submissions fail with
 
 ### Dokploy / external MySQL
 
-By default the web service uses the bundled `db` service on port `3306`. To use an
-external MySQL server instead, deploy as a **Docker Compose** service and set
-`COMPOSE_DB_HOST` and `COMPOSE_DB_PORT` in the Dokploy environment tab, for example:
+Deploy as a **Docker Compose** service. The web service reads `DB_HOST` and
+`DB_PORT` directly from the environment, so set them in the Dokploy environment
+tab to your external MySQL values, for example:
 
 ```text
-COMPOSE_DB_HOST=your-mysql-host
-COMPOSE_DB_PORT=19944
+DB_HOST=your-mysql-host
+DB_PORT=19944
 ```
 
 Also set `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `MYSQL_ROOT_PASSWORD`, `ADMIN_USER`,
 `ADMIN_PASSWORD` and `SECRET_KEY` there. Dokploy writes these to `.env`, and the
-`env_file` entry in `docker-compose.yml` loads them into the app. Leave
-`COMPOSE_DB_HOST`/`COMPOSE_DB_PORT` unset locally to keep using the bundled database.
+`env_file` entry in `docker-compose.yml` loads them into the app.
+
+To use the bundled Compose MySQL instead, set `DB_HOST=db` and `DB_PORT=3306`.
 
 ## Configuration
 
