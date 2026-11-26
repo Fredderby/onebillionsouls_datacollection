@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="description" content="Sign in to review membership reports." />
+    <title>Admin sign in · Membership Report</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&amp;family=Newsreader:opsz,wght@6..72,600&amp;display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}" />
+  </head>
+  <body class="admin-page">
+    <main class="page admin-login-page">
+      <div class="admin-login-card">
+        <header class="admin-login-head">
+          <img class="crest" src="{{ url_for('logo') }}" alt="Deeper Life Bible Church crest" width="52" height="52" />
+          <p class="admin-kicker">Membership report</p>
+          <h1>Admin sign in</h1>
+          <p>Review and export submitted division reports.</p>
+        </header>
+
+        {% if error %}
+        <div class="admin-alert" role="alert">{{ error }}</div>
+        {% endif %}
+
+        <form class="admin-login-form" method="post" action="{{ url_for('admin_login') }}">
+          <div class="admin-field">
+            <label for="username">Username</label>
+            <input id="username" name="username" type="text" autocomplete="username" required autofocus />
+          </div>
+          <div class="admin-field">
+            <label for="password">Password</label>
+            <input id="password" name="password" type="password" autocomplete="current-password" required />
+          </div>
+          <button type="submit" class="admin-btn admin-btn-primary">Sign in</button>
+        </form>
+
+        <a class="admin-back" href="{{ url_for('index') }}">← Back to the form</a>
+      </div>
+    </main>
+  </body>
+</html>

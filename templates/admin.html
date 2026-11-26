@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="description" content="Review and export submitted membership reports." />
+    <title>Reports admin · Membership Report</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&amp;family=Newsreader:opsz,wght@6..72,600&amp;display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}" />
+  </head>
+  <body class="admin-page">
+    <div class="page admin-shell">
+      <header class="admin-topbar">
+        <div class="admin-identity">
+          <img class="crest" src="{{ url_for('logo') }}" alt="Deeper Life Bible Church crest" width="52" height="52" />
+          <div>
+            <p class="admin-kicker">Membership report</p>
+            <h1>Reports admin</h1>
+          </div>
+        </div>
+        <form method="post" action="{{ url_for('admin_logout') }}">
+          <button type="submit" class="admin-btn admin-btn-quiet">Sign out</button>
+        </form>
+      </header>
+
+      <nav class="admin-tabs" aria-label="Admin sections">
+        <a class="admin-tab{% if tab == 'reports' %} active{% endif %}" href="{{ url_for('admin') }}"{% if tab == 'reports' %} aria-current="page"{% endif %}>Reports</a>
+        <a class="admin-tab{% if tab == 'defaulters' %} active{% endif %}" href="{{ url_for('admin', tab='defaulters') }}"{% if tab == 'defaulters' %} aria-current="page"{% endif %}>Defaulters</a>
+      </nav>
+
+      {% if tab == 'reports' %}
+      <section class="admin-panel" aria-labelledby="reportsHeading">
+        <div class="admin-panel-head">
+          <div>
+            <h2 id="reportsHeading">Submitted reports</h2>
+            <p>{{ rows|length }} shown · Newest first</p>
+          </div>
+          <div class="admin-tools">
+            <form class="admin-search" method="get" action="{{ url_for('admin') }}">
+              <input type="search" name="q" value="{{ query }}" placeholder="Search zone, region or division" aria-label="Search reports" />
+              <button type="submit" class="admin-btn admin-btn-quiet">Search</button>
+            </form>
+            <a class="admin-btn admin-btn-accent" href="{{ url_for('admin_export', q=query) }}">Export CSV</a>
+          </div>
+        </div>
+
+        {% if data_error %}
+        <div class="admin-alert" role="alert">{{ data_error }}</div>
+        {% endif %}
+
+        {% if rows %}
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th scope="col">Zone</th>
+                <th scope="col">Region</th>
+                <th scope="col">Division</th>
+                <th scope="col">Date</th>
+                <th scope="col" class="numeric">In person</th>
+                <th scope="col" class="numeric">Online</th>
+                <th scope="col" class="numeric">Grand total</th>
+                <th scope="col">Submitted</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in rows %}
+              {% set in_person = row['adults_male'] + row['adults_female'] + row['youths_male'] + row['youths_female'] + row['ypf_male'] + row['ypf_female'] + row['campus_male'] + row['campus_female'] + row['children_boys'] + row['children_girls'] %}
+              {% set online = row['online_male'] + row['online_female'] %}
+              <tr>
+                <td>{{ row['zone'] }}</td>
+                <td>{{ row['region'] }}</td>
+                <td><strong>{{ row['division'] }}</strong></td>
+                <td>{{ row['reporting_date'] }}</td>
+                <td class="numeric">{{ in_person }}</td>
+                <td class="numeric">{{ online }}</td>
+                <td class="numeric total">{{ in_person + online }}</td>
+                <td>{{ row['submitted_at'] }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <p class="admin-empty">No reports match this search.</p>
+        {% endif %}
+      </section>
+      {% else %}
+      <section class="admin-panel" aria-labelledby="defaultersHeading">
+        <div class="admin-panel-head">
+          <div>
+            <h2 id="defaultersHeading">Defaulters</h2>
+            <p>Divisions with no submission for {{ reporting_date }}</p>
+          </div>
+          <span class="admin-count">{{ missing|length }} missing</span>
+        </div>
+
+        {% if data_error %}
+        <div class="admin-alert" role="alert">{{ data_error }}</div>
+        {% endif %}
+
+        {% if missing %}
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Zone</th>
+                <th scope="col">Region</th>
+                <th scope="col">Division</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in missing %}
+              <tr>
+                <td class="numeric">{{ loop.index }}</td>
+                <td>{{ item.zone }}</td>
+                <td>{{ item.region }}</td>
+                <td><strong>{{ item.division }}</strong></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <p class="admin-empty">Every division has submitted for this date.</p>
+        {% endif %}
+      </section>
+      {% endif %}
+    </div>
+  </body>
+</html>

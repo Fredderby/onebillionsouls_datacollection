@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="description" content="Submit your division's Sunday attendance and workforce figures." />
+    <title>Membership Report · Deeper Life Bible Church</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&amp;family=Newsreader:opsz,wght@6..72,600&amp;display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  </head>
+  <body>
+    <div class="page">
+      <main class="sheet">
+        <aside class="rail" aria-label="Report summary">
+          <header class="rail-brand" style="--i: 0">
+            <img class="crest" src="{{ url_for('logo') }}" alt="Deeper Life Bible Church crest" width="52" height="52" />
+            <p class="rail-kicker">Deeper Life Bible Church</p>
+            <h1>Membership report</h1>
+          </header>
+
+          <div class="rail-date" style="--i: 1">
+            <span>Reporting for</span>
+            <strong>{{ reporting_date }}</strong>
+          </div>
+
+          <div class="rail-progress" style="--i: 2">
+            <div class="progress-head"><span>Form completion</span><strong id="progressCount">0 / 12</strong></div>
+            <div class="progress-track"><span id="progressBar"></span></div>
+          </div>
+
+          <div class="rail-totals" style="--i: 3">
+            <div><span>In person</span><strong id="railInPerson">0</strong></div>
+            <div class="rail-online"><span>Online</span><strong id="railOnline">0</strong></div>
+            <div><span>Grand total</span><strong id="railGrand">0</strong></div>
+          </div>
+
+          <p class="rail-note" style="--i: 4">YPF, Campus and Online are optional. Use 0 where the count is zero.</p>
+        </aside>
+
+        <div class="content">
+          <form id="attendanceForm" novalidate>
+            <div id="formBody">
+              <section class="stage" style="--i: 1" aria-labelledby="locationHeading">
+                <div class="stage-head">
+                  <span class="stage-num">01</span>
+                  <h2 id="locationHeading">Your location</h2>
+                  <p>Choose your zone first, then your region and division.</p>
+                </div>
+
+                <div class="field-grid three">
+                  <div class="field" data-field="zone">
+                    <label for="zone">Select your zone <span class="req" aria-label="required">*</span></label>
+                    <div class="select-wrap">
+                      <select id="zone" name="zone" disabled aria-describedby="zoneError">
+                        <option value="">Loading zones…</option>
+                      </select>
+                    </div>
+                    <p class="error-text" id="zoneError" aria-live="polite"></p>
+                  </div>
+
+                  <div class="field" data-field="region">
+                    <label for="region">Select your region <span class="req" aria-label="required">*</span></label>
+                    <div class="select-wrap">
+                      <select id="region" name="region" disabled aria-describedby="regionError">
+                        <option value="">Select your region</option>
+                      </select>
+                    </div>
+                    <p class="error-text" id="regionError" aria-live="polite"></p>
+                  </div>
+
+                  <div class="field" data-field="division">
+                    <label for="division">Select your division <span class="req" aria-label="required">*</span></label>
+                    <div class="select-wrap">
+                      <select id="division" name="division" disabled aria-describedby="divisionError">
+                        <option value="">Select your division</option>
+                      </select>
+                    </div>
+                    <p class="error-text" id="divisionError" aria-live="polite"></p>
+                  </div>
+                </div>
+              </section>
+
+              <section class="stage" style="--i: 2" aria-labelledby="workforceHeading">
+                <div class="stage-head">
+                  <span class="stage-num">02</span>
+                  <h2 id="workforceHeading">Workforce</h2>
+                  <p>Counts for your entire division. Enter 0 if there are none.</p>
+                </div>
+
+                <div class="field-grid three">
+                  <div class="field" data-field="total_locations">
+                    <label for="total_locations">Number of church Locations <span class="req" aria-label="required">*</span></label>
+                    <input id="total_locations" name="total_locations" type="number" min="0" step="1" inputmode="numeric" placeholder="e.g. 6" aria-describedby="total_locationsError" />
+                    <p class="error-text" id="total_locationsError" aria-live="polite"></p>
+                  </div>
+                  <div class="field" data-field="total_pastors">
+                    <label for="total_pastors">Number of Pastors <span class="req" aria-label="required">*</span></label>
+                    <input id="total_pastors" name="total_pastors" type="number" min="0" step="1" inputmode="numeric" placeholder="e.g. 12" aria-describedby="total_pastorsError" />
+                    <p class="error-text" id="total_pastorsError" aria-live="polite"></p>
+                  </div>
+                  <div class="field" data-field="total_workers">
+                    <label for="total_workers">Church workers <span class="req" aria-label="required">*</span></label>
+                    <input id="total_workers" name="total_workers" type="number" min="0" step="1" inputmode="numeric" placeholder="Brothers and sisters" aria-describedby="total_workersError" />
+                    <p class="error-text" id="total_workersError" aria-live="polite"></p>
+                  </div>
+                </div>
+              </section>
+
+              <section class="stage" style="--i: 3" aria-labelledby="attendanceHeading">
+                <div class="stage-head">
+                  <span class="stage-num">03</span>
+                  <h2 id="attendanceHeading">Church attendance</h2>
+                  <p>Member attendance for {{ reporting_date }}. YPF, Campus and Online may be left blank; use 0 where applicable.</p>
+                </div>
+
+                <div class="ledger" role="group" aria-label="Attendance by category and gender">
+                  <div class="grid-head" aria-hidden="true">
+                    <span>Category</span><span>Male</span><span>Female</span><span>Subtotal</span>
+                  </div>
+
+                  <div class="grid-row">
+                    <div class="category"><span class="dot" aria-hidden="true"></span>Adults</div>
+                    <div class="field compact" data-field="adults_male" data-label="Male">
+                      <label class="sr-only" for="adults_male">Adults, male</label>
+                      <input id="adults_male" name="adults_male" type="number" min="0" step="1" inputmode="numeric" placeholder="0" aria-describedby="adults_maleError" />
+                      <p class="error-text" id="adults_maleError" aria-live="polite"></p>
+                    </div>
+                    <div class="field compact" data-field="adults_female" data-label="Female">
+                      <label class="sr-only" for="adults_female">Adults, female</label>
+                      <input id="adults_female" name="adults_female" type="number" min="0" step="1" inputmode="numeric" placeholder="0" aria-describedby="adults_femaleError" />
+                      <p class="error-text" id="adults_femaleError" aria-live="polite"></p>
+                    </div>
+                    <div class="subtotal" data-subtotal="adults">0</div>
+                  </div>
+
+                  <div class="grid-row">
+                    <div class="category"><span class="dot dot-youths" aria-hidden="true"></span>Youths</div>
+                    <div class="field compact" data-field="youths_male" data-label="Male">
+                      <label class="sr-only" for="youths_male">Youths, male</label>
+                      <input id="youths_male" name="youths_male" type="number" min="0" step="1" inputmode="numeric" placeholder="0" aria-describedby="youths_maleError" />
+                      <p class="error-text" id="youths_maleError" aria-live="polite"></p>
+                    </div>
+                    <div class="field compact" data-field="youths_female" data-label="Female">
+                      <label class="sr-only" for="youths_female">Youths, female</label>
+                      <input id="youths_female" name="youths_female" type="number" min="0" step="1" inputmode="numeric" placeholder="0" aria-describedby="youths_femaleError" />
+                      <p class="error-text" id="youths_femaleError" aria-live="polite"></p>
+                    </div>
+                    <div class="subtotal" data-subtotal="youths">0</div>
+                  </div>
+
+                  <div class="grid-row">
+                    <div class="category"><span class="dot dot-ypf" aria-hidden="true"></span>YPF</div>
+                    <div class="field compact" data-field="ypf_male" data-label="Male">
+                      <label class="sr-only" for="ypf_male">YPF, male</label>
+                      <input id="ypf_male" name="ypf_male" type="number" min="0" step="1" inputmode="numeric" placeholder="0" aria-describedby="ypf_maleError" />
+                      <p class="error-text" id="ypf_maleError" aria-live="polite"></p>
+                    </div>
+                    <div class="field compact" data-field="ypf_female" data-label="Female">
+                      <label class="sr-only" for="ypf_female">YPF, female</label>
+                      <input id="ypf_female" name="ypf_female" type="number" min="0" step="1" inputmode="numeric" placeholder="0" aria-describedby="ypf_femaleError" />
+                      <p class="error-text" id="ypf_femaleError" aria-live="polite"></p>
+                    </div>
+                    <div class="subtotal" data-subtotal="ypf">0</div>
+                  </div>
+
+                  <div class="grid-row">
+                    <div class="category"><span class="dot dot-campus" aria-hidden="true"></span>Campus</div>
+                    <div class="field compact" data-field="campus_male" data-label="Male">
+                      <label class="sr-only" for="campus_male">Campus, male</label>
+                      <input id="campus_male" name="campus_male" type="number" min="0" step="1" inputmode="numeric" placeholder="0" aria-describedby="campus_maleError" />
+                      <p class="error-text" id="campus_maleError" aria-live="polite"></p>
+                    </div>
+                    <div class="field compact" data-field="campus_female" data-label="Female">
+                      <label class="sr-only" for="campus_female">Campus, female</label>
+                      <input id="campus_female" name="campus_female" type="number" min="0" step="1" inputmode="numeric" placeholder="0" aria-describedby="campus_femaleError" />
+                      <p class="error-text" id="campus_femaleError" aria-live="polite"></p>
+                    </div>
+                    <div class="subtotal" data-subtotal="campus">0</div>
+                  </div>
+
+                  <div class="grid-row">
+                    <div class="category"><span class="dot dot-children" aria-hidden="true"></span>Children</div>
+                    <div class="field compact" data-field="children_boys" data-label="Boys">
+                      <label class="sr-only" for="children_boys">Children, boys</label>
+                      <input id="children_boys" name="children_boys" type="number" min="0" step="1" inputmode="numeric" placeholder="0" aria-describedby="children_boysError" />
+                      <p class="error-text" id="children_boysError" aria-live="polite"></p>
+                    </div>
+                    <div class="field compact" data-field="children_girls" data-label="Girls">
+                      <label class="sr-only" for="children_girls">Children, girls</label>
+                      <input id="children_girls" name="children_girls" type="number" min="0" step="1" inputmode="numeric" placeholder="0" aria-describedby="children_girlsError" />
+                      <p class="error-text" id="children_girlsError" aria-live="polite"></p>
+                    </div>
+                    <div class="subtotal" data-subtotal="children">0</div>
+                  </div>
+                </div>
+
+                <div class="online-panel">
+                  <div class="online-copy">
+                    <span class="online-title">Online attendees</span>
+                  </div>
+                  <div class="online-fields">
+                    <div class="field" data-field="online_male">
+                      <label class="sr-only" for="online_male">Online males</label>
+                      <input id="online_male" name="online_male" type="number" min="0" step="1" inputmode="numeric" placeholder="Male" aria-describedby="online_maleError" />
+                      <p class="error-text" id="online_maleError" aria-live="polite"></p>
+                    </div>
+                    <div class="field" data-field="online_female">
+                      <label class="sr-only" for="online_female">Online females</label>
+                      <input id="online_female" name="online_female" type="number" min="0" step="1" inputmode="numeric" placeholder="Female" aria-describedby="online_femaleError" />
+                      <p class="error-text" id="online_femaleError" aria-live="polite"></p>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <div class="totals" aria-live="polite">
+                <div class="stat"><span>In person</span><strong id="totalInPerson">0</strong></div>
+                <div class="stat stat-online"><span>Online</span><strong id="totalOnline">0</strong></div>
+                <div class="stat stat-grand"><span>Grand total</span><strong id="grandTotal">0</strong></div>
+              </div>
+
+              <div id="formError" class="banner" role="alert" hidden></div>
+
+              <div class="actions">
+                <button type="button" class="btn ghost" id="clearBtn">Clear form</button>
+                <button type="submit" class="btn primary" id="submitBtn">
+                  <span class="btn-label">Submit Report</span>
+                  <span class="spinner" aria-hidden="true"></span>
+                </button>
+              </div>
+            </div>
+          </form>
+
+          <section id="successPanel" class="success" hidden aria-live="polite">
+            <div class="success-mark" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="m5 13 4 4L19 7" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </div>
+            <h2>Report saved</h2>
+            <p>Your figures for {{ reporting_date }} are recorded.</p>
+            <p class="reference">Reference <strong id="refId">#00000</strong></p>
+            <button type="button" class="btn primary" id="anotherBtn">Add another report</button>
+          </section>
+        </div>
+      </main>
+      <p class="footer-note">All other fields are required · Counts may be zero <a href="{{ url_for('admin_login') }}">Admin</a></p>
+    </div>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+  </body>
+</html>
