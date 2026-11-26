@@ -26,4 +26,4 @@ Fresh review outcome: no Critical findings. Fixed all actionable items:
 
 Tests: `python -m unittest discover -s tests -v` → 28/28 pass. Review-driven tests were verified RED before fixes and GREEN after.
 
-Docker follow-up: `Dockerfile`, `docker-compose.yml`, `.dockerignore`, `requirements.txt` and `README.md` updated for port 3003 with a Compose-managed MySQL 8 service and named volume. `docker compose config` verified (web 3003:3003, DB_HOST=db, health-gated startup). Image build verification in progress; push to GitHub pending build result.
+Docker follow-up: `Dockerfile`, `docker-compose.yml`, `.dockerignore`, `requirements.txt` and `README.md` updated for port 3003 with a Compose-managed MySQL 8 service and named volume. `docker compose config` verified (web 3003:3003, DB_HOST=db, health-gated startup); `docker compose build` completed successfully (`souls-web:latest`). Local repo initialised on `main` and pushed to `https://github.com/Fredderby/onebillionsouls_datacollection.git`; root commit `0f2c839`.
