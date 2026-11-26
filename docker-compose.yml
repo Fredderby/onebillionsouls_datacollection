@@ -23,8 +23,10 @@ services:
       - .env
     environment:
       PORT: "3003"
-      DB_HOST: db
-      DB_PORT: "3306"
+      # Defaults to the bundled db service. Set COMPOSE_DB_HOST/COMPOSE_DB_PORT
+      # in Dokploy to point the app at an external MySQL instead.
+      DB_HOST: ${COMPOSE_DB_HOST:-db}
+      DB_PORT: ${COMPOSE_DB_PORT:-3306}
     ports:
       - "3003:3003"
     depends_on:
