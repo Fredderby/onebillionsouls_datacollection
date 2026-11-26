@@ -1,6 +1,7 @@
 import csv
 import io
 import os
+import re
 import unittest
 from unittest.mock import patch
 
@@ -307,6 +308,118 @@ class AdminPagesTests(unittest.TestCase):
 
         self.assertIn("ESCAPE '!'", cursor.sql)
         self.assertEqual(cursor.params, ("%100!%!_%",) * 3)
+
+
+class AdminDeleteTests(unittest.TestCase):
+    def setUp(self):
+        self.client = attendance_app.app.test_client()
+        self.env = patch.dict(os.environ, CREDENTIALS)
+        self.env.start()
+        self.addCleanup(self.env.stop)
+        self.client.post(
+            "/admin/login",
+            data={"username": "admin", "password": "correct-horse"},
+        )
+
+    def csrf_token(self):
+        with patch.object(attendance_app, "fetch_reports", return_value=[SAMPLE_ROW]):
+            html = self.client.get("/admin").get_data(as_text=True)
+        match = re.search(r'name="csrf_token" value="([^"]+)"', html)
+        self.assertIsNotNone(match, "Reports page must include a CSRF token")
+        return match.group(1)
+
+    def delete_connection(self, calls):
+        class Cursor:
+            def execute(self, sql, params):
+                calls.append((" ".join(sql.split()), params))
+
+            def close(self):
+                pass
+
+        class Connection:
+            def cursor(self, dictionary=False):
+                return Cursor()
+
+            def commit(self):
+                pass
+
+            def close(self):
+                pass
+
+        return Connection()
+
+    def test_signed_out_admin_cannot_delete(self):
+        self.client.post("/admin/logout")
+        calls = []
+
+        with patch.object(
+            attendance_app, "get_connection", return_value=self.delete_connection(calls)
+        ):
+            response = self.client.post("/admin/reports/7/delete")
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/admin/login", response.headers["Location"])
+        self.assertEqual(calls, [])
+
+    def test_reports_page_offers_a_styled_delete_dialog_for_each_row(self):
+        with patch.object(attendance_app, "fetch_reports", return_value=[SAMPLE_ROW]):
+            html = self.client.get("/admin").get_data(as_text=True)
+
+        self.assertIn('<dialog id="deleteDialog" class="admin-dialog"', html)
+        self.assertIn('data-delete-action="/admin/reports/7/delete"', html)
+        self.assertIn('data-delete-label="Weija"', html)
+        self.assertIn('id="confirmDeleteBtn"', html)
+        self.assertIn('name="csrf_token"', html)
+        self.assertIn('name="q"', html)
+        self.assertIn("/static/admin.js", html)
+
+    def test_delete_removes_the_selected_report_and_keeps_search(self):
+        token = self.csrf_token()
+        calls = []
+
+        with patch.object(
+            attendance_app, "get_connection", return_value=self.delete_connection(calls)
+        ), patch.object(attendance_app, "fetch_reports", return_value=[]):
+            response = self.client.post(
+                "/admin/reports/7/delete",
+                data={"csrf_token": token, "q": "Kasoa"},
+            )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("q=Kasoa", response.headers["Location"])
+        self.assertIn("deleted=1", response.headers["Location"])
+        self.assertEqual(
+            calls, [("DELETE FROM attendance_reports WHERE id = %s", (7,))]
+        )
+        follow_up = self.client.get(response.headers["Location"])
+        self.assertIn(b"Report deleted.", follow_up.data)
+
+    def test_delete_rejects_an_invalid_csrf_token(self):
+        self.csrf_token()
+        calls = []
+
+        with patch.object(
+            attendance_app, "get_connection", return_value=self.delete_connection(calls)
+        ):
+            response = self.client.post(
+                "/admin/reports/7/delete",
+                data={"csrf_token": "not-the-session-token", "q": "Kasoa"},
+            )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn(b"Invalid form token", response.data)
+        self.assertEqual(calls, [])
+
+    def test_delete_surfaces_database_failure(self):
+        token = self.csrf_token()
+
+        with patch.object(attendance_app, "get_connection", side_effect=RuntimeError("offline")):
+            response = self.client.post(
+                "/admin/reports/7/delete", data={"csrf_token": token}
+            )
+
+        self.assertEqual(response.status_code, 503)
+        self.assertIn(b"Could not delete report", response.data)
 
 
 class FormEntryPointTests(unittest.TestCase):

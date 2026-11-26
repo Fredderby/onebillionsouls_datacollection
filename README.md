@@ -51,11 +51,15 @@ For the admin area also set `SECRET_KEY` (a long random string), `ADMIN_USER` an
 After signing in, `/admin` has two tabs:
 
 - **Reports** — newest-first submitted reports, searchable by zone/region/division,
-  with a CSV export of the current filtered view.
+  with a CSV export of the current filtered view. Each row has a **Delete** button
+  that opens a styled confirmation dialog before permanently removing that report.
+  The active search is preserved after deletion.
 - **Defaulters** — every division in `zones.py` with no submission for Sunday,
   29 November 2026.
 
-Admin access is read-only; submissions cannot be edited or deleted from the panel.
+Submissions cannot be edited from the panel. Deletion is permanent and is protected
+by a per-session CSRF token; a deleted division reappears in Defaulters if it has no
+other submission for the reporting date.
 
 ## Files
 
@@ -66,5 +70,6 @@ Admin access is read-only; submissions cannot be edited or deleted from the pane
 - `zones.py` — hierarchy dictionary (source of truth for dropdowns)
 - `templates/admin_login.html`, `templates/admin.html` — admin login and report tables
 - `static/admin.css` — admin-only styling
+- `static/admin.js` — delete confirmation dialog behaviour
 - `Dockerfile`, `docker-compose.yml`, `.dockerignore` — container setup on port 3003
 - `tests/` — validation and admin tests (`python -m unittest discover -s tests`)

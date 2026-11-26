@@ -24,6 +24,8 @@ Fresh review outcome: no Critical findings. Fixed all actionable items:
 - Reports subtitle no longer implies a date filter that the query does not apply.
 - Footer Admin link targets `/admin/login` per spec.
 
-Tests: `python -m unittest discover -s tests -v` → 28/28 pass. Review-driven tests were verified RED before fixes and GREEN after.
+Tests: `python -m unittest discover -s tests -v` → 28/28 pass at that stage. Review-driven tests were verified RED before fixes and GREEN after.
 
 Docker follow-up: `Dockerfile`, `docker-compose.yml`, `.dockerignore`, `requirements.txt` and `README.md` updated for port 3003 with a Compose-managed MySQL 8 service and named volume. `docker compose config` verified (web 3003:3003, DB_HOST=db, health-gated startup); `docker compose build` completed successfully (`souls-web:latest`). Local repo initialised on `main` and pushed to `https://github.com/Fredderby/onebillionsouls_datacollection.git`; root commit `0f2c839`.
+
+Delete follow-up: user asked for admin deletion and then specified that confirmation must "pop up beautifully". Ruling: permanent hard delete only (no schema change), POST-only `/admin/reports/<int:id>/delete`, per-session CSRF token, shared `<dialog>` styled by `admin.css` and driven by `static/admin.js`; native `confirm()` is only a fallback for browsers without `showModal()`. Cost if wrong: deletion is irreversible, so the dialog states that clearly and a deleted division may reappear in Defaulters. Search is preserved via hidden `q`; success/error states are explicit. Five regression tests were written and watched RED before implementation, then GREEN; full suite `python -m unittest discover -s tests -v` → 33/33 pass. Browser verification: temporary row id 7 inserted, Delete opened a modal dialog (`modal: true`, action `/admin/reports/7/delete`, target `Weija`), confirmation removed the row, success banner appeared, no console errors, and SQL confirmed `TEMP_ROW_COUNT 0`.
