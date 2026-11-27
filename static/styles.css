@@ -296,8 +296,8 @@ body {
 }
 
 .field-grid { display: grid; gap: var(--space-md); }
+.field-grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .field-grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-.field-grid.four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .field { min-width: 0; }
 .field > label {
   display: block;
@@ -622,7 +622,7 @@ select:disabled {
 
 /* ---------- Responsive ---------- */
 @media (min-width: 40rem) {
-  .field-grid.three, .field-grid.four { gap: var(--space-lg); }
+  .field-grid.two, .field-grid.three { gap: var(--space-lg); }
 }
 
 /* Desktop: the side rail is a short, self-contained card. */
@@ -643,7 +643,6 @@ select:disabled {
   .rail-totals > div { flex: 1 1 8rem; border-bottom: 0; border-top: 1px solid var(--color-on-ink-2); }
   .rail-note { margin-top: var(--space-md); }
   .stage, .totals { padding: var(--space-md); }
-  .field-grid.four { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   #formBody { padding: var(--space-sm); }
   .actions { padding: var(--space-xs) var(--space-sm) var(--space-sm); }
   .banner { margin: 0; }
@@ -652,7 +651,7 @@ select:disabled {
 @media (max-width: 40rem) {
   .page { padding: var(--space-sm); }
   .sheet { gap: var(--space-2xs); padding: var(--space-xs); }
-  .field-grid.three, .field-grid.four { grid-template-columns: minmax(0, 1fr); }
+  .field-grid.two, .field-grid.three { grid-template-columns: minmax(0, 1fr); }
   .grid-head { display: none; }
   .grid-row { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-xs); padding: var(--space-md); border: 1px solid var(--color-rule); margin-bottom: var(--space-sm); }
   .category { grid-column: 1 / -1; padding-top: 0; }
