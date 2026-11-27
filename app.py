@@ -52,7 +52,8 @@ DB_CONFIG = {
 INTEGER_FIELDS = (
     "total_locations",
     "total_pastors",
-    "total_workers",
+    "workers_brothers",
+    "workers_sisters",
     "adults_male",
     "adults_female",
     "youths_male",
@@ -73,7 +74,7 @@ OPTIONAL_INTEGER_FIELDS = (
     "online_female",
 )
 ALL_FIELDS = SELECT_FIELDS + INTEGER_FIELDS
-LEGACY_IGNORED_FIELDS = {"campus_male", "campus_female"}
+LEGACY_IGNORED_FIELDS = {"campus_male", "campus_female", "total_workers"}
 
 CREATE_TABLE_SQL = """
 CREATE TABLE IF NOT EXISTS attendance_reports (
@@ -84,6 +85,8 @@ CREATE TABLE IF NOT EXISTS attendance_reports (
     total_locations INT NOT NULL,
     total_pastors   INT NOT NULL,
     total_workers   INT NOT NULL,
+    workers_brothers INT NOT NULL DEFAULT 0,
+    workers_sisters  INT NOT NULL DEFAULT 0,
     adults_male     INT NOT NULL,
     adults_female   INT NOT NULL,
     youths_male     INT NOT NULL,
@@ -106,14 +109,16 @@ DELETE_REPORT_SQL = "DELETE FROM attendance_reports WHERE id = %s"
 INSERT_SQL = """
 INSERT INTO attendance_reports (
     zone, region, division,
-    total_locations, total_pastors, total_workers,
+    total_locations, total_pastors,
+    workers_brothers, workers_sisters,
     adults_male, adults_female,
     youths_male, youths_female,
     ypf_male, ypf_female,
     campus_male, campus_female,
     children_boys, children_girls,
-    online_male, online_female, reporting_date
-) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 0, 0, %s, %s, %s, %s, %s)
+    online_male, online_female,
+    total_workers, reporting_date
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 0, 0, %s, %s, %s, %s, %s, %s)
 """
 
 
@@ -134,8 +139,8 @@ def init_db():
         try:
             cursor = connection.cursor()
             cursor.execute(CREATE_TABLE_SQL)
-            # Older versions stored a single total_online column; add the new
-            # gender-specific columns without disturbing any existing rows.
+            # Older versions stored combined or fewer columns; add the new
+            # split columns without disturbing any existing rows.
             cursor.execute(
                 """SELECT COLUMN_NAME FROM information_schema.COLUMNS
                    WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s""",
@@ -147,7 +152,12 @@ def init_db():
                     "ALTER TABLE attendance_reports "
                     "MODIFY COLUMN total_online INT NOT NULL DEFAULT 0"
                 )
-            for column in ("online_male", "online_female"):
+            for column in (
+                "online_male",
+                "online_female",
+                "workers_brothers",
+                "workers_sisters",
+            ):
                 if column not in existing_columns:
                     cursor.execute(
                         f"ALTER TABLE attendance_reports "
@@ -248,7 +258,11 @@ def submit():
     if errors:
         return jsonify({"ok": False, "errors": errors}), 400
 
-    params = [values[key] for key in ALL_FIELDS] + [REPORTING_DATE.isoformat()]
+    total_workers = values["workers_brothers"] + values["workers_sisters"]
+    params = [values[key] for key in ALL_FIELDS] + [
+        total_workers,
+        REPORTING_DATE.isoformat(),
+    ]
 
     connection = None
     try:
@@ -287,7 +301,8 @@ def submit():
 
 REPORT_COLUMNS = (
     "id", "zone", "region", "division", "reporting_date", "submitted_at",
-    "total_locations", "total_pastors", "total_workers",
+    "total_locations", "total_pastors",
+    "workers_brothers", "workers_sisters", "total_workers",
     "adults_male", "adults_female", "youths_male", "youths_female",
     "ypf_male", "ypf_female",
     "children_boys", "children_girls", "online_male", "online_female",
@@ -295,7 +310,8 @@ REPORT_COLUMNS = (
 
 CSV_HEADERS = (
     "zone", "region", "division", "reporting_date", "submitted_at",
-    "church_locations", "pastors", "workers",
+    "church_locations", "pastors",
+    "workers_brothers", "workers_sisters", "workers_total",
     "adults_male", "adults_female", "youths_male", "youths_female",
     "ypf_male", "ypf_female",
     "children_boys", "children_girls", "online_male", "online_female",

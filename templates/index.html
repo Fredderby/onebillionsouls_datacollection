@@ -26,7 +26,7 @@
           </div>
 
           <div class="rail-progress" style="--i: 2">
-            <div class="progress-head"><span>Form completion</span><strong id="progressCount">0 / 12</strong></div>
+            <div class="progress-head"><span>Form completion</span><strong id="progressCount">0 / 13</strong></div>
             <div class="progress-track"><span id="progressBar"></span></div>
           </div>
 
@@ -91,7 +91,7 @@
                   <p>Counts for your entire division. Enter 0 if there are none.</p>
                 </div>
 
-                <div class="field-grid three">
+                <div class="field-grid four">
                   <div class="field" data-field="total_locations">
                     <label for="total_locations">Number of church Locations <span class="req" aria-label="required">*</span></label>
                     <input id="total_locations" name="total_locations" type="number" min="0" step="1" inputmode="numeric" placeholder="e.g. 6" aria-describedby="total_locationsError" />
@@ -102,10 +102,15 @@
                     <input id="total_pastors" name="total_pastors" type="number" min="0" step="1" inputmode="numeric" placeholder="e.g. 12" aria-describedby="total_pastorsError" />
                     <p class="error-text" id="total_pastorsError" aria-live="polite"></p>
                   </div>
-                  <div class="field" data-field="total_workers">
-                    <label for="total_workers">Church workers <span class="req" aria-label="required">*</span></label>
-                    <input id="total_workers" name="total_workers" type="number" min="0" step="1" inputmode="numeric" placeholder="Brothers and sisters" aria-describedby="total_workersError" />
-                    <p class="error-text" id="total_workersError" aria-live="polite"></p>
+                  <div class="field" data-field="workers_brothers">
+                    <label for="workers_brothers">Church workers — Brothers <span class="req" aria-label="required">*</span></label>
+                    <input id="workers_brothers" name="workers_brothers" type="number" min="0" step="1" inputmode="numeric" placeholder="Brothers" aria-describedby="workers_brothersError" />
+                    <p class="error-text" id="workers_brothersError" aria-live="polite"></p>
+                  </div>
+                  <div class="field" data-field="workers_sisters">
+                    <label for="workers_sisters">Church workers — Sisters <span class="req" aria-label="required">*</span></label>
+                    <input id="workers_sisters" name="workers_sisters" type="number" min="0" step="1" inputmode="numeric" placeholder="Sisters" aria-describedby="workers_sistersError" />
+                    <p class="error-text" id="workers_sistersError" aria-live="polite"></p>
                   </div>
                 </div>
               </section>

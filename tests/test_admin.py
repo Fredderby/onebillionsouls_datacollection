@@ -24,6 +24,8 @@ SAMPLE_ROW = {
     "submitted_at": "2026-11-26 18:00:00",
     "total_locations": 2,
     "total_pastors": 3,
+    "workers_brothers": 5,
+    "workers_sisters": 3,
     "total_workers": 8,
     "adults_male": 20,
     "adults_female": 22,
@@ -235,9 +237,26 @@ class AdminAuthTests(unittest.TestCase):
             text = self.client.get("/admin/export.csv").get_data(as_text=True)
 
         rows = list(csv.reader(io.StringIO(text)))
-        self.assertEqual(len(rows[0]), 18)
+        self.assertEqual(len(rows[0]), 20)
         self.assertNotIn("campus_male", rows[0])
         self.assertNotIn("campus_female", rows[0])
+
+    def test_export_includes_split_worker_columns(self):
+        self.client.post(
+            "/admin/login",
+            data={"username": "admin", "password": "correct-horse"},
+        )
+
+        with patch.object(attendance_app, "fetch_reports", return_value=[SAMPLE_ROW]):
+            text = self.client.get("/admin/export.csv").get_data(as_text=True)
+
+        rows = list(csv.reader(io.StringIO(text)))
+        self.assertIn("workers_brothers", rows[0])
+        self.assertIn("workers_sisters", rows[0])
+        self.assertIn("workers_total", rows[0])
+        self.assertEqual(rows[1][rows[0].index("workers_brothers")], "5")
+        self.assertEqual(rows[1][rows[0].index("workers_sisters")], "3")
+        self.assertEqual(rows[1][rows[0].index("workers_total")], "8")
 
 
 class AdminPagesTests(unittest.TestCase):

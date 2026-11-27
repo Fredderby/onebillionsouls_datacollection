@@ -17,7 +17,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const SELECT_FIELDS = ["zone", "region", "division"];
   const INTEGER_FIELDS = [
-    "total_locations", "total_pastors", "total_workers",
+    "total_locations", "total_pastors",
+    "workers_brothers", "workers_sisters",
     "adults_male", "adults_female",
     "youths_male", "youths_female",
     "ypf_male", "ypf_female",
