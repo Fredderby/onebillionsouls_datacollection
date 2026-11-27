@@ -81,6 +81,12 @@ class ValidationTests(unittest.TestCase):
         self.assertIn('class="submit-progress-fill"', html)
         self.assertIn('id="submitProgress" class="submit-progress" role="status" aria-label="Saving report" hidden', html)
 
+    def test_attendance_section_is_labelled_membership(self):
+        html = attendance_app.app.test_client().get("/").get_data(as_text=True)
+
+        self.assertIn('<h2 id="attendanceHeading">Membership</h2>', html)
+        self.assertNotIn("Church attendance", html)
+
     def test_campus_exclusion_note_appears_before_location(self):
         html = attendance_app.app.test_client().get("/").get_data(as_text=True)
         note = "Campus workers and leaders are excluded from this form. Their reports are submitted separately."
