@@ -81,6 +81,14 @@ class ValidationTests(unittest.TestCase):
         self.assertIn('class="submit-progress-fill"', html)
         self.assertIn('id="submitProgress" class="submit-progress" role="status" aria-label="Saving report" hidden', html)
 
+    def test_campus_exclusion_note_appears_before_location(self):
+        html = attendance_app.app.test_client().get("/").get_data(as_text=True)
+        note = "Campus workers and leaders are excluded from this form. Their reports are submitted separately."
+
+        self.assertIn('class="form-note"', html)
+        self.assertIn(note, html)
+        self.assertLess(html.index(note), html.index('id="locationHeading"'))
+
     def test_insert_sql_matches_the_payload_shape(self):
         self.assertEqual(
             attendance_app.INSERT_SQL.count("%s"),
@@ -108,7 +116,6 @@ class ValidationTests(unittest.TestCase):
 
         self.assertNotIn("campus_male", html)
         self.assertNotIn("campus_female", html)
-        self.assertNotIn("Campus", html)
 
 
 if __name__ == "__main__":

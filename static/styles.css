@@ -249,6 +249,17 @@ body {
   padding: var(--space-md);
   background: var(--color-paper-2);
 }
+.form-note {
+  margin: 0;
+  padding: var(--space-sm) var(--space-md);
+  color: var(--color-ink-2);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  background: var(--color-sky-soft);
+  border-left: 3px solid var(--color-accent);
+  border-radius: var(--radius-input);
+}
+.form-note strong { color: var(--color-accent); }
 .stage {
   padding: var(--space-lg);
   background: var(--color-paper);
