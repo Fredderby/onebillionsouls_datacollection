@@ -286,6 +286,33 @@ class AdminPagesTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn(b"Could not load reports", response.data)
 
+    def test_reports_tab_has_a_full_detail_dialog(self):
+        with patch.object(attendance_app, "fetch_reports", return_value=[SAMPLE_ROW]):
+            response = self.client.get("/admin")
+
+        html = response.get_data(as_text=True)
+        self.assertIn("admin-report-trigger", html)
+        self.assertIn('id="reportDialog"', html)
+        self.assertIn("data-report=", html)
+        for label in (
+            "Church locations",
+            "Pastors",
+            "Workers — Brothers",
+            "Workers — Sisters",
+            "Workers — Total",
+            "Adults — Male",
+            "Adults — Female",
+            "Youths — Male",
+            "Youths — Female",
+            "YPF — Male",
+            "YPF — Female",
+            "Children — Boys",
+            "Children — Girls",
+            "Online — Male",
+            "Online — Female",
+        ):
+            self.assertIn(label, html)
+
     def test_reports_tab_excludes_campus_from_totals(self):
         row = dict(SAMPLE_ROW, campus_male=100, campus_female=100)
 

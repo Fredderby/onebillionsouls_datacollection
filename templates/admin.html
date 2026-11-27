@@ -86,7 +86,31 @@
                 <td class="numeric total">{{ in_person + online }}</td>
                 <td>{{ row['submitted_at'] }}</td>
                 <td class="actions">
-                  <button type="button" class="admin-btn admin-btn-danger delete-trigger" data-delete-action="{{ url_for('admin_delete_report', report_id=row['id']) }}" data-delete-label="{{ row['division'] }}" aria-haspopup="dialog">Delete</button>
+                  <div class="admin-row-actions">
+                    <button type="button" class="admin-btn admin-report-trigger" data-report="{{ {
+                      'zone': row['zone'],
+                      'region': row['region'],
+                      'division': row['division'],
+                      'reporting_date': row['reporting_date']|string,
+                      'submitted_at': row['submitted_at']|string,
+                      'total_locations': row['total_locations'],
+                      'total_pastors': row['total_pastors'],
+                      'workers_brothers': row['workers_brothers'],
+                      'workers_sisters': row['workers_sisters'],
+                      'total_workers': row['total_workers'],
+                      'adults_male': row['adults_male'],
+                      'adults_female': row['adults_female'],
+                      'youths_male': row['youths_male'],
+                      'youths_female': row['youths_female'],
+                      'ypf_male': row['ypf_male'],
+                      'ypf_female': row['ypf_female'],
+                      'children_boys': row['children_boys'],
+                      'children_girls': row['children_girls'],
+                      'online_male': row['online_male'],
+                      'online_female': row['online_female']
+                    } | tojson | forceescape }}" aria-haspopup="dialog">View</button>
+                    <button type="button" class="admin-btn admin-btn-danger delete-trigger" data-delete-action="{{ url_for('admin_delete_report', report_id=row['id']) }}" data-delete-label="{{ row['division'] }}" aria-haspopup="dialog">Delete</button>
+                  </div>
                 </td>
               </tr>
               {% endfor %}
@@ -109,6 +133,59 @@
               <button type="submit" class="admin-btn admin-btn-danger" id="confirmDeleteBtn">Delete report</button>
             </div>
           </form>
+        </dialog>
+
+        <dialog id="reportDialog" class="admin-dialog admin-report-dialog" aria-labelledby="reportDialogTitle">
+          <div class="admin-dialog-form">
+            <div class="admin-dialog-icon admin-report-icon" aria-hidden="true">i</div>
+            <h2 id="reportDialogTitle">Report details</h2>
+            <p class="admin-report-summary" id="reportDialogSummary"></p>
+
+            <section class="admin-report-section" aria-labelledby="reportLocationHeading">
+              <h3 id="reportLocationHeading">Location</h3>
+              <dl class="admin-report-grid">
+                <div><dt>Zone</dt><dd data-report-field="zone"></dd></div>
+                <div><dt>Region</dt><dd data-report-field="region"></dd></div>
+                <div><dt>Division</dt><dd data-report-field="division"></dd></div>
+                <div><dt>Reporting date</dt><dd data-report-field="reporting_date"></dd></div>
+                <div><dt>Submitted</dt><dd data-report-field="submitted_at"></dd></div>
+              </dl>
+            </section>
+
+            <section class="admin-report-section" aria-labelledby="reportWorkforceHeading">
+              <h3 id="reportWorkforceHeading">Workforce</h3>
+              <dl class="admin-report-grid">
+                <div><dt>Church locations</dt><dd data-report-field="total_locations"></dd></div>
+                <div><dt>Pastors</dt><dd data-report-field="total_pastors"></dd></div>
+                <div><dt>Workers — Brothers</dt><dd data-report-field="workers_brothers"></dd></div>
+                <div><dt>Workers — Sisters</dt><dd data-report-field="workers_sisters"></dd></div>
+                <div><dt>Workers — Total</dt><dd data-report-field="total_workers"></dd></div>
+              </dl>
+            </section>
+
+            <section class="admin-report-section" aria-labelledby="reportMembershipHeading">
+              <h3 id="reportMembershipHeading">Membership</h3>
+              <dl class="admin-report-grid">
+                <div><dt>Adults — Male</dt><dd data-report-field="adults_male"></dd></div>
+                <div><dt>Adults — Female</dt><dd data-report-field="adults_female"></dd></div>
+                <div><dt>Youths — Male</dt><dd data-report-field="youths_male"></dd></div>
+                <div><dt>Youths — Female</dt><dd data-report-field="youths_female"></dd></div>
+                <div><dt>YPF — Male</dt><dd data-report-field="ypf_male"></dd></div>
+                <div><dt>YPF — Female</dt><dd data-report-field="ypf_female"></dd></div>
+                <div><dt>Children — Boys</dt><dd data-report-field="children_boys"></dd></div>
+                <div><dt>Children — Girls</dt><dd data-report-field="children_girls"></dd></div>
+                <div><dt>Online — Male</dt><dd data-report-field="online_male"></dd></div>
+                <div><dt>Online — Female</dt><dd data-report-field="online_female"></dd></div>
+                <div><dt>In person</dt><dd data-report-field="in_person"></dd></div>
+                <div><dt>Online total</dt><dd data-report-field="online_total"></dd></div>
+                <div><dt>Grand total</dt><dd data-report-field="grand_total"></dd></div>
+              </dl>
+            </section>
+
+            <div class="admin-dialog-actions">
+              <button type="button" class="admin-btn admin-btn-quiet" id="closeReportBtn">Close</button>
+            </div>
+          </div>
         </dialog>
       </section>
       {% else %}

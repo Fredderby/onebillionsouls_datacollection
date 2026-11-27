@@ -311,6 +311,48 @@ body.admin-page {
   .admin-dialog[open] { animation: none; }
 }
 
+.admin-report-dialog {
+  width: min(48rem, calc(100vw - 2rem));
+  max-height: min(88vh, 48rem);
+  overflow-y: auto;
+  border-top-color: var(--color-sky);
+}
+.admin-report-icon { background: var(--color-sky); }
+.admin-report-summary {
+  font-weight: 600;
+  color: var(--color-ink) !important;
+}
+.admin-report-section {
+  padding-top: var(--space-sm);
+  border-top: 1px solid var(--color-rule-2);
+}
+.admin-report-section h3 {
+  margin: 0 0 var(--space-xs);
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  font-weight: 600;
+}
+.admin-report-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-sm) var(--space-md);
+  margin: 0;
+}
+.admin-report-grid > div { display: grid; gap: 2px; }
+.admin-report-grid dt {
+  color: var(--color-muted);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.admin-report-grid dd {
+  margin: 0;
+  color: var(--color-ink);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
 .admin-count {
   padding: var(--space-2xs) var(--space-sm);
   color: var(--color-accent);
@@ -344,6 +386,11 @@ body.admin-page {
 .admin-table .numeric { text-align: right; font-variant-numeric: tabular-nums; }
 .admin-table .total { color: var(--color-accent); font-weight: 600; }
 .admin-table td.actions { text-align: right; }
+.admin-row-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2xs);
+}
 .admin-empty {
   margin: 0;
   padding: var(--space-xl);
@@ -360,4 +407,6 @@ body.admin-page {
   .admin-panel { padding: var(--space-md); }
   .admin-search input { width: 100%; }
   .admin-tools { width: 100%; }
+  .admin-report-grid { grid-template-columns: minmax(0, 1fr); }
+  .admin-row-actions { flex-wrap: wrap; }
 }
