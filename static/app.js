@@ -21,13 +21,11 @@ document.addEventListener("DOMContentLoaded", () => {
     "adults_male", "adults_female",
     "youths_male", "youths_female",
     "ypf_male", "ypf_female",
-    "campus_male", "campus_female",
     "children_boys", "children_girls",
     "online_male", "online_female",
   ];
   const OPTIONAL_FIELDS = [
     "ypf_male", "ypf_female",
-    "campus_male", "campus_female",
     "online_male", "online_female",
   ];
   const REQUIRED_INTEGER_FIELDS = INTEGER_FIELDS.filter(
@@ -37,7 +35,6 @@ document.addEventListener("DOMContentLoaded", () => {
     { prefix: "adults", male: "adults_male", female: "adults_female" },
     { prefix: "youths", male: "youths_male", female: "youths_female" },
     { prefix: "ypf", male: "ypf_male", female: "ypf_female" },
-    { prefix: "campus", male: "campus_male", female: "campus_female" },
     { prefix: "children", male: "children_boys", female: "children_girls" },
   ];
 

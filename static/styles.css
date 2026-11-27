@@ -399,7 +399,6 @@ select:disabled {
 }
 .dot-youths { background: var(--color-sky); }
 .dot-ypf { background: var(--color-accent); }
-.dot-campus { background: var(--color-ink-2); }
 .dot-children { background: var(--color-sky); }
 .subtotal {
   padding-top: var(--space-xs);
