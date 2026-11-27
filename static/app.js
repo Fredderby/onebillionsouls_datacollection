@@ -117,6 +117,12 @@ document.addEventListener("DOMContentLoaded", () => {
     updateProgress();
   });
 
+  divisionSelect.addEventListener("change", () => {
+    clearFieldError("division");
+    hideBanner();
+    updateProgress();
+  });
+
   /* ---------- live totals ---------- */
   function numberValue(id) {
     const raw = document.getElementById(id).value.trim();
