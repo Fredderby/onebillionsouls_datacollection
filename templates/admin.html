@@ -74,7 +74,7 @@
             </thead>
             <tbody>
               {% for row in rows %}
-              {% set in_person = row['adults_male'] + row['adults_female'] + row['youths_male'] + row['youths_female'] + row['ypf_male'] + row['ypf_female'] + row['campus_male'] + row['campus_female'] + row['children_boys'] + row['children_girls'] %}
+              {% set in_person = row['adults_male'] + row['adults_female'] + row['youths_male'] + row['youths_female'] + row['ypf_male'] + row['ypf_female'] + row['children_boys'] + row['children_girls'] %}
               {% set online = row['online_male'] + row['online_female'] %}
               <tr>
                 <td>{{ row['zone'] }}</td>

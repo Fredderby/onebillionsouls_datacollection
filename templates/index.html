@@ -36,7 +36,7 @@
             <div><span>Grand total</span><strong id="railGrand">0</strong></div>
           </div>
 
-          <p class="rail-note" style="--i: 4">YPF, Campus and Online are optional. Use 0 where the count is zero.</p>
+          <p class="rail-note" style="--i: 4">YPF and Online are optional. Use 0 where the count is zero.</p>
         </aside>
 
         <div class="content">
@@ -112,7 +112,7 @@
                 <div class="stage-head">
                   <span class="stage-num">03</span>
                   <h2 id="attendanceHeading">Church attendance</h2>
-                  <p>Member attendance for {{ reporting_date }}. YPF, Campus and Online may be left blank; use 0 where applicable.</p>
+                  <p>Member attendance for {{ reporting_date }}. YPF and Online may be left blank; use 0 where applicable.</p>
                 </div>
 
                 <div class="ledger" role="group" aria-label="Attendance by category and gender">
@@ -163,21 +163,6 @@
                       <p class="error-text" id="ypf_femaleError" aria-live="polite"></p>
                     </div>
                     <div class="subtotal" data-subtotal="ypf">0</div>
-                  </div>
-
-                  <div class="grid-row">
-                    <div class="category"><span class="dot dot-campus" aria-hidden="true"></span>Campus</div>
-                    <div class="field compact" data-field="campus_male" data-label="Male">
-                      <label class="sr-only" for="campus_male">Campus, male</label>
-                      <input id="campus_male" name="campus_male" type="number" min="0" step="1" inputmode="numeric" placeholder="0" aria-describedby="campus_maleError" />
-                      <p class="error-text" id="campus_maleError" aria-live="polite"></p>
-                    </div>
-                    <div class="field compact" data-field="campus_female" data-label="Female">
-                      <label class="sr-only" for="campus_female">Campus, female</label>
-                      <input id="campus_female" name="campus_female" type="number" min="0" step="1" inputmode="numeric" placeholder="0" aria-describedby="campus_femaleError" />
-                      <p class="error-text" id="campus_femaleError" aria-live="polite"></p>
-                    </div>
-                    <div class="subtotal" data-subtotal="campus">0</div>
                   </div>
 
                   <div class="grid-row">

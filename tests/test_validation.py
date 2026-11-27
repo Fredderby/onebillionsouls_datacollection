@@ -18,8 +18,6 @@ REQUIRED_INTEGERS = (
 OPTIONAL_INTEGERS = (
     "ypf_male",
     "ypf_female",
-    "campus_male",
-    "campus_female",
     "online_male",
     "online_female",
 )
@@ -82,6 +80,35 @@ class ValidationTests(unittest.TestCase):
         self.assertIn('class="submit-progress-track"', html)
         self.assertIn('class="submit-progress-fill"', html)
         self.assertIn('id="submitProgress" class="submit-progress" role="status" aria-label="Saving report" hidden', html)
+
+    def test_insert_sql_matches_the_payload_shape(self):
+        self.assertEqual(
+            attendance_app.INSERT_SQL.count("%s"),
+            len(attendance_app.ALL_FIELDS) + 1,
+        )
+
+    def test_campus_fields_are_not_required_or_accepted(self):
+        payload = required_payload()
+        values, errors = attendance_app.validate(payload)
+
+        self.assertEqual(errors, {})
+        self.assertNotIn("campus_male", values)
+        self.assertNotIn("campus_female", values)
+
+        values, errors = attendance_app.validate(
+            dict(payload, campus_male="10", campus_female="20")
+        )
+
+        self.assertEqual(errors, {})
+        self.assertNotIn("campus_male", values)
+        self.assertNotIn("campus_female", values)
+
+    def test_rendered_form_has_no_campus_fields(self):
+        html = attendance_app.app.test_client().get("/").get_data(as_text=True)
+
+        self.assertNotIn("campus_male", html)
+        self.assertNotIn("campus_female", html)
+        self.assertNotIn("Campus", html)
 
 
 if __name__ == "__main__":

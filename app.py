@@ -59,8 +59,6 @@ INTEGER_FIELDS = (
     "youths_female",
     "ypf_male",
     "ypf_female",
-    "campus_male",
-    "campus_female",
     "children_boys",
     "children_girls",
     "online_male",
@@ -71,12 +69,11 @@ SELECT_FIELDS = ("zone", "region", "division")
 OPTIONAL_INTEGER_FIELDS = (
     "ypf_male",
     "ypf_female",
-    "campus_male",
-    "campus_female",
     "online_male",
     "online_female",
 )
 ALL_FIELDS = SELECT_FIELDS + INTEGER_FIELDS
+LEGACY_IGNORED_FIELDS = {"campus_male", "campus_female"}
 
 CREATE_TABLE_SQL = """
 CREATE TABLE IF NOT EXISTS attendance_reports (
@@ -116,7 +113,7 @@ INSERT INTO attendance_reports (
     campus_male, campus_female,
     children_boys, children_girls,
     online_male, online_female, reporting_date
-) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 0, 0, %s, %s, %s, %s, %s)
 """
 
 
@@ -178,7 +175,7 @@ def validate(payload):
     values = {}
 
     for key in payload:
-        if key not in ALL_FIELDS:
+        if key not in ALL_FIELDS and key not in LEGACY_IGNORED_FIELDS:
             errors[key] = "Unexpected field."
 
     zone = str(payload.get("zone") or "").strip()
@@ -292,7 +289,7 @@ REPORT_COLUMNS = (
     "id", "zone", "region", "division", "reporting_date", "submitted_at",
     "total_locations", "total_pastors", "total_workers",
     "adults_male", "adults_female", "youths_male", "youths_female",
-    "ypf_male", "ypf_female", "campus_male", "campus_female",
+    "ypf_male", "ypf_female",
     "children_boys", "children_girls", "online_male", "online_female",
 )
 
@@ -300,7 +297,7 @@ CSV_HEADERS = (
     "zone", "region", "division", "reporting_date", "submitted_at",
     "church_locations", "pastors", "workers",
     "adults_male", "adults_female", "youths_male", "youths_female",
-    "ypf_male", "ypf_female", "campus_male", "campus_female",
+    "ypf_male", "ypf_female",
     "children_boys", "children_girls", "online_male", "online_female",
 )
 

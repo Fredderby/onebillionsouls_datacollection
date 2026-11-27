@@ -225,6 +225,20 @@ class AdminAuthTests(unittest.TestCase):
         self.assertEqual(response.status_code, 503)
         self.assertIn(b"Could not load reports", response.data)
 
+    def test_export_does_not_include_campus_columns(self):
+        self.client.post(
+            "/admin/login",
+            data={"username": "admin", "password": "correct-horse"},
+        )
+
+        with patch.object(attendance_app, "fetch_reports", return_value=[SAMPLE_ROW]):
+            text = self.client.get("/admin/export.csv").get_data(as_text=True)
+
+        rows = list(csv.reader(io.StringIO(text)))
+        self.assertEqual(len(rows[0]), 18)
+        self.assertNotIn("campus_male", rows[0])
+        self.assertNotIn("campus_female", rows[0])
+
 
 class AdminPagesTests(unittest.TestCase):
     def setUp(self):
@@ -252,6 +266,17 @@ class AdminPagesTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn(b"Could not load reports", response.data)
+
+    def test_reports_tab_excludes_campus_from_totals(self):
+        row = dict(SAMPLE_ROW, campus_male=100, campus_female=100)
+
+        with patch.object(attendance_app, "fetch_reports", return_value=[row]):
+            response = self.client.get("/admin")
+
+        html = response.get_data(as_text=True)
+        self.assertIn('<td class="numeric">64</td>', html)
+        self.assertIn('<td class="numeric total">67</td>', html)
+        self.assertNotIn("264", html)
 
     def test_defaulters_tab_walks_the_whole_hierarchy(self):
         with patch.object(attendance_app, "fetch_submitted_pairs", return_value=[]):
